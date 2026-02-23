@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Airspace Map (2D/3D Unified)</title>
+
+    <!-- Leaflet (2D) -->
+    <link rel="stylesheet" href="./vendor/leaflet.css" />
+    <script src="./vendor/leaflet.js"></script>
+    <script src="./vendor/ne_countries_inline.js"></script>    
+
+    <!-- Cesium (3D) -->
+    <link
+      rel="stylesheet"
+      href="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Widgets/widgets.css"
+    />
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
+
+    <!-- App styles -->
+    <script type="module" crossorigin src="./assets/index-CoYYaWsW.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BD3xIbKO.css">
+  </head>
+
+  <body>
+    <!-- MENU BAR (shared wrapper, but we hide 3D-only controls in 2D mode) -->
+    <div id="mapMenuBar" class="map-menu-bar">
+      <button id="rpToggle" class="map-btn is-open" title="Hide Route Panel">▼</button>
+
+      <button id="btnMode" class="map-btn">
+        <span id="modeLabel">3D</span>
+      </button>
+
+      <!-- 2D legacy buttons (keep IDs so you can bind old functions later) -->
+      <button id="resetViewBtn" class="map-btn ">RTE Clear</button>
+      <button id="toggleRouteTipsBtn" class="map-btn ">RTE Info</button>
+
+      <div id="ddLayers" class="dropdown map-btn-panel">
+        <button class="map-btn" id="btnLayers">Map Layers ▸</button>
+        <div class="panel all-checkboxes" id="panelLayers">         
+          <label
+            ><input id="togFixNames" type="checkbox" checked /> Fix Names</label
+          >   
+          <label><input id="mlAwyLabels" type="checkbox" /> AWY Labels</label>                   
+          <hr />
+          <label><input id="togFixes" type="checkbox" checked /> Fixes</label>
+          <label><input id="togAirways" type="checkbox" checked /> Airways</label
+          >
+          <hr />
+          <!-- Added from old 2D file -->         
+          <label><input id="mlRunways" type="checkbox" checked /> Runways</label>
+          <label><input id="togAirspace" type="checkbox" checked /> Boundary</label> 
+          <hr>         
+          <label><input id="mlBorders" type="checkbox" /> Countries</label>
+          <label><input id="mlAirspace" type="checkbox" checked /> Airspace</label>
+          </hr>
+        </div>
+      </div>
+
+      <!-- Areas (2D only) -->
+      <div id="ddAreas" class="dropdown map-btn-panel">
+        <button class="map-btn" id="btnAreas">Areas ▸</button>
+        <div class="panel all-checkboxes" id="panelAreas">       
+          <label><input type="checkbox" id="toggleProhibitated" /> Prohibitated</label>
+          <label><input type="checkbox" id="toggleRestricted" /> Restricted</label>
+          <label><input type="checkbox" id="toggleDanger" /> Danger</label>
+          <label><input type="checkbox" id="toggleTraining" /> Training</label>
+          <label><input type="checkbox" id="toggleCTA" /> CTA</label>
+          <hr>          
+          <label><input type="checkbox" id="toggleDetails" /> Info</label>
+          <button id="clearAreasBtn" class="map-btn" type="button">Clear</button>
+          </hr>
+        </div>
+      </div>
+
+      <button id="showHoldingsBtn" class="map-btn">HLD pts</button>
+      <button id="toggleFreqBtn" class="map-btn mode-2d-only">FREQ</button>
+
+      <!-- SIDs (2D only) -->
+      <div id="ddSids" class="dropdown map-btn-panel mode-2d-only">
+        <button class="map-btn" id="btnSids">SIDs ▸</button>
+        <div class="panel all-checkboxes" id="panelSids">
+          <label><input type="checkbox" id="rwyOMAA13" /> AA_13</label>
+          <label><input type="checkbox" id="rwyOMAA31" /> AA_31</label>
+          <label><input type="checkbox" id="rwyOMAD13" /> AD_13</label>
+          <label><input type="checkbox" id="rwyOMDB12" /> DB_12</label>
+          <label><input type="checkbox" id="rwyOMSJ12" /> SJ_12</label>
+        </div>
+      </div>
+
+      <button id="toggleMapBtn" class="map-btn mode-2d-only">Geo Map</button>
+
+      <!--vertical slide exaggerate button-->
+      <div id="zWrap" class="zwrap mode-3d-only">
+        <span>Vertical:</span>
+        <input id="zScale" type="range" min="1" max="15" step="0.5" value="3" />
+        <span id="zVal">3.0x</span>
+      </div>
+            <!-- reserved for Cesium built-ins (3D only) -->
+      <div id="cesiumControls" class="cesium-controls mode-3d-only"></div>
+
+      <div id="sectorPanel" class="map-btn-panel">
+        <div class="sector-info-group">
+          <button id="toggleTableBtn" class="map-btn">Sector Info ▸</button>
+          <div class="sector-btn-wrapper">
+            <button id="sectorHeader" class="map-btn">Sectors ▸</button>
+            <div id="sectorOptions" class="sector-checkboxes">
+              <label class="high">
+                <input type="checkbox" id="selectHighSectors" /> High
+              </label>
+              <label class="low">
+                <input type="checkbox" id="selectLowSectors" /> Low
+              </label>
+              <hr style="margin: 3px; border-color: #016f7e" />
+
+              <div class="high">
+                <label><input type="checkbox" value="S" /> ACCS</label>
+                <label><input type="checkbox" value="L" /> ACCL</label>
+                <label><input type="checkbox" value="B" /> ACCB</label>
+              </div>
+              <div class="low">
+                <label><input type="checkbox" value="G" /> ACCG</label>
+                <label><input type="checkbox" value="A" /> ACCA</label>
+              </div>
+
+              <hr style="margin: 3px; border-color: #bab6b6" />
+
+              <div class="high">
+                <label><input type="checkbox" value="N" /> ACCN</label>
+                <label><input type="checkbox" value="M" /> ACCM</label>
+              </div>
+              <div class="low">
+                <label><input type="checkbox" value="W" /> ACCW</label>
+              </div>
+
+              <hr style="margin: 3px; border-color: #bab6b6" />
+
+              <div class="high">
+                <label><input type="checkbox" value="C" /> ACCC</label>
+              </div>
+              <div class="low">
+                <label><input type="checkbox" value="D" /> ACCD</label>
+                <label><input type="checkbox" value="H" /> ACCH</label>
+                <label><input type="checkbox" value="K" />kBox</label>
+              </div>
+              <hr style="margin: 3px; border-color: #bab6b6" />
+
+              <div class="low">
+                <label><input type="checkbox" value="E" /> ACCE</label>
+                <label><input type="checkbox" value="Y" /> ACCY</label>
+              </div>
+
+              <hr style="margin: 3px; border-color: #bab6b6" />
+
+              <div class="low">
+                <label><input type="checkbox" value="R" /> ACCR</label>
+              </div>
+              <hr style="margin: 3px; border-color: #016f7e" />
+
+              <div class="sector-style">
+                <label
+                  ><input type="checkbox" id="showSectorColors" /> Color</label
+                >
+                <label
+                  ><input type="checkbox" id="showSectorBorder" /> Border</label
+                >
+
+                <div class="sector-opacity-row">
+                  <span></span>
+                  <input
+                    type="range"
+                    id="sectorOpacity"
+                    min="0.1"
+                    max="0.5"
+                    step="0.05"
+                    value="0.2"
+                  />
+                  <span id="sectorOpacityVal"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button id="toolMenu" class="map-btn mode-2d-only">Tools</button>
+        </div>
+      </div>
+    </div>
+
+    </div>
+    <!-- MAP CONTAINERS (we keep both and show one) -->
+    <div id="map2d" class="map map--active"></div>
+    <div id="map3d" class="map"></div>
+    <input type="text" id="mouseCoords" class="mouseCoords mode-2d-only"readonly />
+
+    <!-- ROUTE PAIRS PANEL -->
+    <div id="routePanel">
+      <div id="routeFilters">
+        <!--<button class="filter-btn selected" data-filter="All">All</button>-->
+        <button class="filter-btn" data-filter="Arr">Arr</button>
+        <button class="filter-btn" data-filter="Dep">Dep</button>
+        <button class="filter-btn" data-filter="Ovf">Ovf</button>
+        <button class="filter-btn" data-filter="FRA">FRA</button>
+      </div>
+      <div id="routeList"></div>
+    </div>
+
+    <!-- Bottom tooltips (ported from old 2D file) -->
+    <div id="tooltipContainer" class="tooltip-container">
+      <div id="sectorTooltip" class="tooltip">Sectors:</div>
+      <div id="routeTooltip" class="tooltip">Route:</div>
+      <div id="expandedRouteTooltip" class="tooltip">Waypoints:</div>
+      <div id="remarksOverlay" class="tooltip">Remarks:</div>
+    </div>
+
+    <div id="areaDetailsPanel" class="area-details-panel">
+      <strong id="areaName">Area</strong>
+      <span id="areaLimit"></span>
+      <span id="areaType"></span>
+    </div>
+
+    <!-- --------Floating Table for sector info (ported from old index.txt)--------------->
+    <div id="sectorTablePanel" class="sector-table-panel" style="display: none">
+      <table id="sectorTable" class="sector-table" aria-label="Sector Info">
+        <thead>
+          <tr>
+            <th>Sectors</th>
+            <th>Limit</th>
+            <th>Freq</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="toolBar" class="tool-bar mode-2d-only">
+      <!--<button id="toolsBtn" class ="tool-btn">Tools</button>-->
+      <button id="rblToolBtn" class="tool-btn">RBL</button>
+      <button id="clearRblBtn" class="tool-btn">Clear RBLs</button>
+      <button id="measureBtn" class="tool-btn">Scale</button>
+      <button id="clearMeasuresBtn" class="tool-btn">Clear Scale</button>
+      <button id="penBtn" class="tool-btn">Pen</button>
+      <button id="clearPenBtn" class="tool-btn">Clear Pen</button>
+      <button id="textToolBtn" class="tool-btn">Text Box</button>
+      <button id="clearTextBtn" class="tool-btn">Clear Boxes</button>
+      <button id="eraserBtn" class="tool-btn">Eraser</button>
+    </div>
+
+    <!-- Shared app logic -->
+  </body>
+</html>
