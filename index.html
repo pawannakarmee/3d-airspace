@@ -18,8 +18,8 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
 
     <!-- App styles -->
-    <script type="module" crossorigin src="./assets/index-BDR_DdJj.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BxTNa-dP.css">
+    <script type="module" crossorigin src="./assets/index-Bwon_yJP.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BCeMa3Z7.css">
   </head>
 
   <body>
@@ -31,6 +31,10 @@
         <span id="modeLabel">3D</span>
       </button>
 
+      <button id="toggleMapBtn" class="map-btn mode-2d-only">Geo Map</button>
+      <button id="toggleMapBtn3D" class="map-btn mode-3d-only" title="Toggle base map">
+        Geo Map
+      </button>
       <!-- 2D legacy buttons (keep IDs so you can bind old functions later) -->
       <button id="resetViewBtn" class="map-btn ">RTE Clear</button>
       <button id="toggleRouteTipsBtn" class="map-btn ">RTE Info</button>
@@ -88,7 +92,6 @@
         </div>
       </div>
 
-      <button id="toggleMapBtn" class="map-btn mode-2d-only">Geo Map</button>
 
       <!--vertical slide exaggerate button-->
       <div id="zWrap" class="zwrap mode-3d-only">
@@ -190,6 +193,37 @@
     <div id="map2d" class="map map--active"></div>
     <div id="map3d" class="map"></div>
     <input type="text" id="mouseCoords" class="mouseCoords mode-2d-only" readonly />
+
+    <!-- 3D Route Vertical Profile (user-defined CFL / FIX+LEVEL / XFL) -->
+    <div id="routeAltPanel3D" class="route-alt-panel mode-3d-only" style="display:none;">
+      <div id="routeAltDrag3D" class="route-alt-title" title="Drag to move">Route vertical profile</div>
+
+      <div class="route-alt-row">
+        <label for="routeAltCfl3D">CFL</label>
+        <input id="routeAltCfl3D" type="text" inputmode="text" placeholder="e.g. F210" />
+      </div>
+
+      <div class="route-alt-row">
+        <label for="routeAltFix3D">Fix</label>
+        <select id="routeAltFix3D"></select>
+      </div>
+
+      <div class="route-alt-row">
+        <label for="routeAltLevel3D">Level</label>
+        <input id="routeAltLevel3D" type="text" inputmode="text" placeholder="e.g. F150" />
+      </div>
+
+      <div class="route-alt-row">
+        <label for="routeAltXfl3D">XFL</label>
+        <input id="routeAltXfl3D" type="text" inputmode="text" placeholder="e.g. A100" />
+      </div>
+
+      <div class="route-alt-actions">
+        <button id="applyRouteAlt3D" class="route-alt-btn">Apply</button>
+        <button id="clearRouteAlt3D" class="route-alt-btn">Clear</button>
+      </div>
+      <div id="routeAltHint3D" class="route-alt-hint">Tip: set CFL/XFL and (optional) fix+level, then Apply.</div>
+    </div>
 
     <!-- ROUTE PAIRS PANEL -->
     <div id="routePanel">
