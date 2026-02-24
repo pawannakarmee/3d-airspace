@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Airspace Map (2D/3D Unified)</title>
+ 
+    <script>
+      let lastTouchEnd = 0;
 
+      document.addEventListener(
+        "touchend",
+        function (event) {
+          const now = Date.now();
+          if (now - lastTouchEnd <= 350) {
+            event.preventDefault(); // block iOS double tap zoom
+          }
+          lastTouchEnd = now;
+        },
+        { passive: false }
+      );
+    </script>
+    
     <!-- Leaflet (2D) -->
     <link rel="stylesheet" href="./vendor/leaflet.css" />
     <script src="./vendor/leaflet.js"></script>
@@ -18,8 +34,8 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
 
     <!-- App styles -->
-    <script type="module" crossorigin src="./assets/index-BuZpkEIs.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-B8UwFNfs.css">
+    <script type="module" crossorigin src="./assets/index-B0gaHrhH.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BM37HXlr.css">
   </head>
 
   <body>
